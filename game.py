@@ -36,7 +36,7 @@ def analyze(word):
 	params={
 	    "entry": word
 	  }
-	print(word)
+	print word
 	r = requests.get(url, headers=headers, params = params)
 	r1 = requests.get(url1, headers = headers1)
 	data = json.loads(r.text)
@@ -50,7 +50,7 @@ def analyze(word):
 		unsuccessful_words.append(word)
 		base_form = word
 		missing_data = 0
-		print(data)
+		print data
 	else:
 		base_form = data["response"]
 		grade = data["ten_degree"]
@@ -78,12 +78,21 @@ def analyze(word):
 count=0
 dict1 = {}
 
+def check (word):
+	colnames = ['Word', 'base_form', 'grade', 'synonyms', 'missing_data']
+	data = pandas.read_csv('ListOfWords.csv', names=colnames)
+	word_list = data.Word.tolist()
+	if (word in word_list):
+		return True
+	else:
+		return False
+
 # a flow that creates a csv file with the fields - word, base form, grade, synonyms, missing data (flag)
 for word in word_list:
 	if (check(word)==False):
 		info = analyze(word)
-		print(info)
-		print ("added " + word + " to dictionary")
+		print info
+		print "added " + word + " to dictionary"
 		with open('ListOfWords.csv','a') as csv_file:
 			newFileWriter = csv.writer(csv_file)
 			syn = ', '.join(info[word]['synonyms'])
@@ -91,11 +100,11 @@ for word in word_list:
 		dict1[word] = info[word]
 		count=count+1
 		if (count%10==0):
-			print("---------------------------------")
-			print(str(count) + " words added to the list")
-			print("---------------------------------")
+			print "---------------------------------"
+			print str(count) + " words added to the list"
+			print "---------------------------------"
 			# print(dict1)
-			print(unsuccessful_words)
+			print unsuccessful_words
 
 #Changes main csv to base formatted csv
 # input : csv file (the one that the flow above created)
@@ -118,16 +127,9 @@ def shift_csv(file):
 		writer.writerow(["base_form", "grade", "synonyms", "missing_data", "other_words"])
 		values = list(new_csv.values())
 		for val in values:
-			print(val)
+			print val
 			other_words = ', '.join(val[4])
 			writer.writerow([val[0], val[1], val[2], val[3], other_words])
 	return new_csv
 
-def check (word):
-	colnames = ['Word', 'base_form', 'grade', 'synonyms', 'missing_data']
-	data = pandas.read_csv('ListOfWords.csv', names=colnames)
-	word_list = data.Word.tolist()
-	if (word in word_list):
-		return True
-	else:
-		return False
+
